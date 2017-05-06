@@ -1,24 +1,37 @@
 # S&T Solar Car Battery Grouping
 
+## Functionality overview
+1. Reads data from a `CSV file` containing a cell ID, capacity, and internal resistance for any number of cells. That data is stored into a list for easy manipulation.
+2. The batteries are sorted in ascending order first by resistance then by capacity.
+
+## Input file layout
+The input `CSV file` should look like this:
+
+| Cell Number   | Capacity   | Internal Resistance  |
+| :------------:|:----------:| --------------------:|
+| 1             | 3000       | 75                   |
+| 2             | 3380       | 80                   |
+
+etc.
+
+With commas ( , ) as the delimiters.
+
 ## Install Dependencies
-This program uses the colorama module for python.
+This program uses the `colorama` module for python.
 
 Install on Windows using
 
     > py -m pip install colorama
+
 or
 
     > python -m pip install colorama
 
-## Running the program
+## Run the program
+Open the command prompt in the same directory where `main.py` and the `CSV file` containing the data are located. Run the following command:
     > py main.py (filename)
 
-Where (filename) is a `CSV file` in the same directory as `main.py` and you have `Python 3` installed.
-
-## Functionality overview
-
-1. Reads data from a `CSV file` containing capacity, internal resistance, and cell ID for any number of cells. That data is stored into a list for easy manipulation.
-2. The battery statistics are analyzed and groupings of 12 cells each are made using metrics yet to be determined.
+Where (filename) is the `CSV file`.
 
 ## What if the battery pack structure changes?
 

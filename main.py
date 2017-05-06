@@ -2,7 +2,6 @@ import os
 import csv
 import sys
 import math
-import numpy as np
 from colorama import init
 
 # Constants
