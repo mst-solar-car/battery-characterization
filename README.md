@@ -1,6 +1,16 @@
 # S&T Solar Car Battery Grouping
 
+## Install Dependencies
+This program uses the colorama module for python.
+
+Install on Windows using
+    > py -m pip install colorama
+or
+    > python -m pip install colorama
+
 ## Running the program
+    > py main.py (filename)
+or 
     > python main.py (filename)
 Where (filename) is a `CSV file` in the same directory as `main.py` and you have `Python 3` installed.
 
