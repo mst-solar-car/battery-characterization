@@ -129,7 +129,7 @@ for row in modules:
 index = 0
 totalResistances = []
 for row in modules:
-    denominator = 1
+    denominator = 0
     for elem in row:
         if elem.resistance != 0:
             denominator = denominator + (1 / elem.resistance)
