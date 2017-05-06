@@ -2,6 +2,7 @@ import os
 import csv
 import sys
 import math
+import datetime
 from colorama import init
 
 # Constants
@@ -18,6 +19,8 @@ END_COLOR = '\033[30m'
 # Class definitions
 class BatteryCell:
     capacity = reistance = id = 0
+
+os.system('cls')
 
 # Function declarations
 
@@ -135,19 +138,34 @@ for row in modules:
     index = index + 1
 
 
+
+# Create file for saving the output of the modules
+file_name = "output_" + str(time.time()) + ".txt"
+output_file = open(file_name, 'w')
+
+def output(str):
+    print(str)
+    output_file.write(str)
+    output_file.write("\n")
+
+
 # Print the final modules along with the worst capacity of each module
 count = 1
 print("ID\t\tResistance\tCapacity")
 for row in modules:
-    print("Module", count)
-    print("  Capacity: ", worstCapacities[count-1])
-    print("  Resistance: ", totalResistances[count-1])
+    output("Module " + str(count))
+    output("  Capacity: " + str(worstCapacities[count-1]))
+    output("  Resistance: " + str(totalResistances[count-1]))
     for elem in row:
         if elem.resistance != 0: # Are there still valid batteries in the list
             # Adjust the tabbing accordingly
             if elem.resistance < 100:
-                print(elem.id, "\t\t", elem.resistance, "\t\t", elem.capacity)
+                output(str(elem.id)+ "\t\t" + str(elem.resistance)+ "\t\t"+ str(elem.capacity))
             else:
-                print(elem.id, "\t\t", elem.resistance, "\t", elem.capacity)
-    print("\n")
+                output(str(elem.id)+ "\t\t", str(elem.resistance)+ "\t"+ str(elem.capacity))
+    output("\n")
     count = count + 1
+    input("Press Enter to show the next module")
+    os.system('cls')
+
+output_file.close()
