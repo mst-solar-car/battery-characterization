@@ -123,12 +123,26 @@ for row in modules:
     worstCapacities.insert(count, worstCapacity)
     count = count + 1
 
+# Get the total resistance for each module
+index = 0
+totalResistances = []
+for row in modules:
+    denominator = 1
+    for elem in row:
+        if elem.resistance != 0:
+            denominator = denominator + (1 / elem.resistance)
+
+    totalResistances.insert(index, 1 / denominator)
+    index = index + 1
+
+
 # Print the final modules along with the worst capacity of each module
 count = 1
 print("ID\t\tResistance\tCapacity")
 for row in modules:
     print("Module", count)
-    print("Worst Cell:", worstCapacities[count-1])
+    print("  Capacity: ", worstCapacities[count-1])
+    print("  Resistance: ", totalResistances[count-1])
     for elem in row:
         if elem.resistance != 0: # Are there still valid batteries in the list
             # Adjust the tabbing accordingly
