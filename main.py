@@ -93,7 +93,7 @@ batt = BatteryCell()
 batt.id = batt.resistance = batt.capacity = 0
 
 # Modules array
-modules = [[batt for x in range(MODULE_CELLS)] for y in range(math.floor(len(sortedBats_resistance)/MODULE_CELLS) - 1)]
+modules = [[batt for x in range(MODULE_CELLS)] for y in range(math.floor(len(sortedBats_resistance)/MODULE_CELLS))]
 
 # Counting variables
 moduleCount = 0

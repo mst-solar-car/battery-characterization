@@ -1,12 +1,12 @@
 # S&T Solar Car Battery Grouping
 
 ## Running the program
-    > python main.py (filename)
+    > py main.py (filename)
 Where (filename) is a `CSV file` in the same directory as `main.py` and you have `Python 3` installed.
 
 ## Functionality overview
 
-1. Reads data from a `CSV file` containing capacity and internal resistance for any number of cells. That data is stored into a list for easy manipulation.
+1. Reads data from a `CSV file` containing capacity, internal resistance, and cell ID for any number of cells. That data is stored into a list for easy manipulation.
 2. The battery statistics are analyzed and groupings of 12 cells each are made using metrics yet to be determined.
 
 ## What if the battery pack structure changes?
