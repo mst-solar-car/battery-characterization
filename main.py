@@ -2,87 +2,90 @@ import os
 import csv
 import sys
 import math
-import datetime
+import time
+import battery
+import functions as funcs
+import constants as const
+
+'''
 from colorama import init
-
-# Constants
-PACK_CELLS = 420
-MODULE_CELLS = 12
-DAMN_BIG_NUMBER = 10000000000000000
-
-# Get us some fancy colors
 init()  # Initialize colorama
-YELLOW = '\033[93m'
-RED = '\033[91m'
-END_COLOR = '\033[30m'
+'''
 
-# Class definitions
-class BatteryCell:
-    capacity = reistance = id = 0
-
+# Clear the console screen
 os.system('cls')
-
-# Function declarations
-
-# printErr(...) prints the given message to the screen in red
-def printErr(msg):
-    print(RED + msg + END_COLOR)
-
-# sort(...) (bubblesort) sorts the given list first on capacity then on resistance
-def sort(list):
-    n = len(list)
-    swapped = True
-    while swapped:
-        swapped = False
-        for i in range(1, n):
-            # if the pair is out of order
-            if list[i-1].capacity > list[i].capacity:
-                # swap
-                tmp = list[i-1]
-                list[i-1] = list[i]
-                list[i] = tmp
-                swapped = True
-            elif list[i-1].capacity == list[i].capacity:
-                if list[i-1].resistance > list[i].resistance:
-                    # swap
-                    tmp = list[i-1]
-                    list[i-1] = list[i]
-                    list[i] = tmp
-                    swapped = True
-
 
 # Read command line arguments
 if len(sys.argv) > 1:
     fileName = sys.argv[1]
 else:
-    printErr("Include the file name as a commandline parameter.")
-    sys.exit();
-
+    # Default to battery stat. sheet
+    fileName = 'SCT 2017 Battery Stats - Cell Data.csv'
 
 # Open and prepare the file
-file = open(fileName, 'r+')
-csv1 = csv.reader(file, delimiter=',')
+# Check to see if the file exists
+if os.path.exists(fileName):
+    file = open(fileName, 'r+')
+    csv_file = csv.reader(file, delimiter=',')
+else:
+    print("The provided filename can't be found. Exiting program.")
+    exit()
 
 
-# Get data from the csv and store it in the battery array
+# Get data from the csv and store it in the battery list
 batteries = []
-battIndex = 0   # Current index for batts array
+characterizedBatts = []
+battIndex = 0   # Current index for batteries list
+charBattIndex = 0   # Current index for the characterizedBatts list
+
 count = 0   # Start recording batteries once the count is 2
-for row in csv1:
-    if count >= 1:
-        newBat = BatteryCell()
-        newBat.id = int(row[0])
-        newBat.capacity = int(row[1])
-        newBat.resistance = float(row[2])
-        batteries.insert(battIndex, newBat)
-        battIndex = battIndex + 1
-    else:
-        count = count + 1
+            # Actual data starts on the 3rd line of the CSV
+for row in csv_file:
+    if count >= 2:
+        id = row[0]
+        capacity = row[1]
+        resistance = row[2]
+        module = row[4]
+
+        # Check to make sure we have data and make sure the cell module cell is
+        # empty so we don't double dip when making modules
+        if id != "" and capacity != "" and resistance != "":
+            # Convert each id, capacity, and module from strings to their proper datatype
+            id = int(id)
+            capacity = int(capacity)
+            resistance = float(resistance)
+
+            if module == "":
+                # This battery still needs to be placed in a module
+                # Put it in the batteries list to be sorted
+                newBat = battery.BatteryCell(id, capacity, resistance, -1) # Cells without modules have a module value of -1
+                batteries.insert(battIndex, newBat)
+                battIndex = battIndex + 1
+            else:
+                # This battery has already been sorted
+                # Cast the value to an integer
+                module = int(module)
+
+                # Put it in the characterizedBatts list so they aren't resorted
+                newBat = battery.BatteryCell(id, capacity, resistance, module)
+                characterizedBatts.insert(charBattIndex, newBat)
 
 
-# Sort the battery array by resistances
-sortedBats_resistance = batteries
-sort(sortedBats_resistance)
+                '''if capacity != 0 and resistance != 0:
+                    newBat = battery.BatteryCell(int(id), int(capacity), float(resistance))
+                    batteries.insert(battIndex, newBat)
+                    battIndex = battIndex + 1'''
+
+    count = count + 1
+file.close()
+
+
+# Sort the batteries list by resistances
+sortedBatts = batteries
+funcs.sortByCap_Res(sortedBatts)
+
+# Sort the characterizedBatts list by module for easy display
+funcs.sortByModule(characterizedBatts)
 
 
 # TODO: Calculate std. deviation and do more intense statistical analysis
@@ -90,21 +93,25 @@ sort(sortedBats_resistance)
 
 # Group Cells
 
-# dummy cell to populate the module array
-batt = BatteryCell()
-batt.id = batt.resistance = batt.capacity = 0
+# Get the current module we are assembling (largest module number from characterizedBatts)
+currentModule = funcs.getMaxModule(characterizedBatts)
 
-# Modules array
-modules = [[batt for x in range(MODULE_CELLS)] for y in range(math.floor(len(sortedBats_resistance)/MODULE_CELLS))]
+# dummy cell to populate the module array
+batt = battery.BatteryCell(0,0,0,-1)
+
+# Modules array - 2D list of size MODULE_CELLS x CURRENT_NUM_MODULES
+# floor(total num cells / num cells per module) gives us the number of modules
+CURRENT_NUM_MODULES = math.floor(len(sortedBatts)/const.MODULE_CELLS)
+modules = [[batt for x in range(const.MODULE_CELLS)] for y in range(CURRENT_NUM_MODULES)]
 
 # Counting variables
 moduleCount = 0
 battCount = 0
 
 # Populate the module array
-for batt in sortedBats_resistance:
+for batt in sortedBatts:
     # Fill up each row in the array - rows have MODULE_CELLS open spaces
-    if battCount < MODULE_CELLS:
+    if battCount < const.MODULE_CELLS:
         modules[moduleCount][battCount] = batt
         battCount = battCount + 1
     else:
@@ -115,15 +122,15 @@ for batt in sortedBats_resistance:
 
 
 # Calculate the worst capacity for each module, store that into an a array
-count = 0
+index = 0
 worstCapacities = []
 for row in modules:
-    worstCapacity = DAMN_BIG_NUMBER
+    worstCapacity = const.DAMN_BIG_NUMBER
     for elem in row:
         if elem.capacity < worstCapacity:
             worstCapacity = elem.capacity
-    worstCapacities.insert(count, worstCapacity)
-    count = count + 1
+    worstCapacities.insert(index, worstCapacity)
+    index = index + 1
 
 # Get the total resistance for each module
 index = 0
@@ -134,7 +141,8 @@ for row in modules:
         if elem.resistance != 0:
             denominator = denominator + (1 / elem.resistance)
 
-    totalResistances.insert(index, 1 / denominator)
+    if denominator != 0:
+        totalResistances.insert(index, 1 / denominator)
     index = index + 1
 
 
@@ -143,28 +151,26 @@ for row in modules:
 file_name = "output_" + str(time.time()) + ".txt"
 output_file = open(file_name, 'w')
 
-def output(str):
-    print(str)
-    output_file.write(str)
-    output_file.write("\n")
 
 
 # Print the final modules along with the worst capacity of each module
-count = 1
-print("ID\t\tResistance\tCapacity")
+index = 0
+moduleCount = currentModule + 1
 for row in modules:
-    output("Module " + str(count))
-    output("  Capacity: " + str(worstCapacities[count-1]))
-    output("  Resistance: " + str(totalResistances[count-1]))
+    print("Module " + str(moduleCount))
+    print("Capacity: " + str(worstCapacities[index-1]))
+    print("Resistance: " + str(totalResistances[index-1]))
+    print("ID\t\tResistance\tCapacity")
     for elem in row:
         if elem.resistance != 0: # Are there still valid batteries in the list
             # Adjust the tabbing accordingly
             if elem.resistance < 100:
-                output(str(elem.id)+ "\t\t" + str(elem.resistance)+ "\t\t"+ str(elem.capacity))
+                print(str(elem.id)+ "\t\t" + str(elem.resistance)+ "\t\t"+ str(elem.capacity))
             else:
-                output(str(elem.id)+ "\t\t", str(elem.resistance)+ "\t"+ str(elem.capacity))
-    output("\n")
-    count = count + 1
+                print(str(elem.id)+ "\t\t", str(elem.resistance)+ "\t"+ str(elem.capacity))
+    print("\n")
+    index = index + 1
+    moduleCount = moduleCount + 1
     input("Press Enter to show the next module")
     os.system('cls')
 

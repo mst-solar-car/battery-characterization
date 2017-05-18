@@ -7,10 +7,10 @@
 ## Input file layout
 The input `CSV file` should look like this:
 
-| Cell Number   | Capacity   | Internal Resistance  |
-| :------------:|:----------:| --------------------:|
-| 1             | 3000       | 75                   |
-| 2             | 3380       | 80                   |
+| Cell Number   | Capacity   | Internal Resistance  | Module |
+| :------------:|:----------:| --------------------:|--------|
+| 1             | 3000       | 75                   | 1      |
+| 2             | 3380       | 80                   | 1      |
 
 etc.
 
