@@ -15,16 +15,22 @@ init()  # Initialize colorama
 # Clear the console screen
 os.system('cls')
 
+fileName = ""
+
 # Read command line arguments
 if len(sys.argv) > 1:
     fileName = sys.argv[1]
 else:
-    # Default to battery stat. sheet
-    fileName = 'SCT 2017 Battery Stats - Cell Data.csv'
+    # Find the first CSV (alphabetically) in the current directory
+    for subfile in os.listdir(os.getcwd()):
+        if subfile.endswith(".csv"):
+            fileName = subfile
+            break
+
 
 # Open and prepare the file
 # Check to see if the file exists
-if os.path.exists(fileName):
+if fileName and os.path.exists(fileName):
     file = open(fileName, 'r+')
     csv_file = csv.reader(file, delimiter=',')
 else:
