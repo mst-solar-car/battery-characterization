@@ -16,29 +16,24 @@ etc.
 
 With commas ( , ) as the delimiters.
 
-## Install Dependencies
-This program uses the `colorama` module for python.
-
-Install on Windows using
-
-    > py -m pip install colorama
-
-or
-
-    > python -m pip install colorama
 
 ## Run the program
 Open the command prompt in the same directory where `main.py` and the `CSV file` containing the data are located. Run the following command:
-    > py main.py (filename)
 
-Where (filename) is the `CSV file`.
+    > py main.py <filename>
+
+Where `<filename>` is the `CSV file`.
+
+If you omit `<filename>` the program will use the **first** csv it finds in the directory the script is running in.
 
 ## What if the battery pack structure changes?
 
 It is highly possible that in the future, the structure of the battery pack will change and therefore the batteries will need to be characterized differently.
 The code present in this project is generic enough to be used on future packs with only *minor* tweaks such as the alteration of the following constants:
 
+```
     PACK_CELLS = 420;
     MODULE_CELLS = 12;
+```
 
 These variables govern the number of cells in the pack as a whole and the number of cells per parallel grouping (module) respectively.
