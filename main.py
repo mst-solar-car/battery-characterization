@@ -7,11 +7,6 @@ import battery
 import functions as funcs
 import constants as const
 
-'''
-from colorama import init
-init()  # Initialize colorama
-'''
-
 # Clear the console screen
 os.system('cls')
 
@@ -88,13 +83,22 @@ funcs.sortByCap_Res(sortedBatts)
 funcs.sortByModule(characterizedBatts)
 
 
-# TODO: Calculate std. deviation and do more intense statistical analysis
+# TODO: Calculate std. deviation and actually do more intense statistical analysis
 
 
-# Group Cells
+''' Group Cells '''
 
-# Get the current module we are assembling (largest module number from characterizedBatts)
-currentModule = funcs.getMaxModule(characterizedBatts)
+# Create list of used module #'s
+usedModules = []
+for batt in characterizedBatts:
+    if not (batt.module in usedModules):
+        usedModules.append(batt.module)
+
+#  Get the current module we are assembling so we don't double up on module names
+cellLabels = []
+for i in range(0, const.PACK_CELLS):
+    if not (i in usedModules):
+        cellLabels.append(i)
 
 # dummy cell to populate the module array
 batt = battery.BatteryCell(0,0,0,-1)
@@ -155,9 +159,8 @@ output_file = open(file_name, 'w')
 
 # Print the final modules along with the worst capacity of each module
 index = 0
-moduleCount = currentModule + 1
 for row in modules:
-    print("Module " + str(moduleCount))
+    print("Module " + str(cellLabels[index]))
     print("Capacity: " + str(worstCapacities[index-1]))
     print("Resistance: " + str(totalResistances[index-1]))
     print("ID\t\tResistance\tCapacity")
